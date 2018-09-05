@@ -6,6 +6,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
@@ -165,8 +166,13 @@ public class MainActivity extends AppCompatActivity {
         equal.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                char temp=show_equation.charAt(show_equation.length()-1);
                 if(show_equation.charAt(0)=='-')
                     show_equation.insert(0,"0");
+                if(temp=='+'||temp=='-')
+                    show_equation.append("0");
+                if(temp=='*'||temp=='/')
+                    show_equation.append("1");
                 StringBuilder temp1=new StringBuilder();
                 for(int i=0;i<show_equation.length();i++){
                     if(show_equation.charAt(i)>='0'&&show_equation.charAt(i)<='9'||show_equation.charAt(i)=='.'){
@@ -191,28 +197,56 @@ public class MainActivity extends AppCompatActivity {
         add.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                show_equation.append("+");
+                char temp=show_equation.charAt(show_equation.length()-1);
+                if(temp=='+'||temp=='-'||temp=='*'||temp=='/')
+                {
+                    show_equation.deleteCharAt(show_equation.length()-1);
+                    show_equation.append("+");
+                }
+                else
+                    show_equation.append("+");
                 result.setText(show_equation);
             }
         });
         sub.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                show_equation.append("-");
+                char temp=show_equation.charAt(show_equation.length()-1);
+                if(temp=='+'||temp=='-'||temp=='*'||temp=='/')
+                {
+                    show_equation.deleteCharAt(show_equation.length()-1);
+                    show_equation.append("-");
+                }
+                else
+                    show_equation.append("-");
                 result.setText(show_equation);
             }
         });
         mul.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                show_equation.append("*");
+                char temp=show_equation.charAt(show_equation.length()-1);
+                if(temp=='+'||temp=='-'||temp=='*'||temp=='/')
+                {
+                    show_equation.deleteCharAt(show_equation.length()-1);
+                    show_equation.append("*");
+                }
+                else
+                    show_equation.append("*");
                 result.setText(show_equation);
             }
         });
         div.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                show_equation.append("/");
+                char temp=show_equation.charAt(show_equation.length()-1);
+                if(temp=='+'||temp=='-'||temp=='*'||temp=='/')
+                {
+                    show_equation.deleteCharAt(show_equation.length()-1);
+                    show_equation.append("/");
+                }
+                else
+                    show_equation.append("/");
                 result.setText(show_equation);
             }
         });
@@ -240,6 +274,30 @@ public class MainActivity extends AppCompatActivity {
         else
             return true;
     }
+    //相加
+    public static double Add(double d1,double d2) {
+        BigDecimal b1 = new BigDecimal(Double.toString(d1));
+        BigDecimal b2 = new BigDecimal(Double.toString(d2));
+        return b1.add(b2).doubleValue();
+    }
+    //相减
+    public static double Sub(double d1,double d2){
+        BigDecimal b1=new BigDecimal(Double.toString(d1));
+        BigDecimal b2=new BigDecimal(Double.toString(d2));
+        return b1.subtract(b2).doubleValue();
+    }
+    //相乘
+    public static double Mul(double d1,double d2){
+        BigDecimal b1=new BigDecimal(Double.toString(d1));
+        BigDecimal b2=new BigDecimal(Double.toString(d2));
+        return b1.multiply(b2).doubleValue();
+    }
+    //相除
+    public static double Div(double d1,double d2){
+        BigDecimal b1=new BigDecimal(Double.toString(d1));
+        BigDecimal b2=new BigDecimal(Double.toString(d2));
+        return b1.divide(b2,10,BigDecimal.ROUND_HALF_UP).doubleValue();
+    }
     protected String calculate(ArrayList equation){
         Double temp2;
         Double temp3;
@@ -262,10 +320,10 @@ public class MainActivity extends AppCompatActivity {
                         temp2=(Double.parseDouble(operand.get(operand.size()-1).toString()));
                         operand.remove(operand.size()-1);
                         switch (temp5.charAt(0)){
-                            case '+':{result=temp2+temp3;operand.add(String.valueOf(result));break;}
-                            case '-':{result=temp2-temp3;operand.add(String.valueOf(result));break;}
-                            case '*':{result=temp2*temp3;operand.add(String.valueOf(result));break;}
-                            case '/':{result=temp2/temp3;operand.add(String.valueOf(result));break;}
+                            case '+':{result=Add(temp2,temp3);operand.add(String.valueOf(result));break;}
+                            case '-':{result=Sub(temp2,temp3);operand.add(String.valueOf(result));break;}
+                            case '*':{result=Mul(temp2,temp3);operand.add(String.valueOf(result));break;}
+                            case '/':{result=Div(temp2,temp3);operand.add(String.valueOf(result));break;}
                         }
                         if(operator.size()>0)
                         {
@@ -290,10 +348,10 @@ public class MainActivity extends AppCompatActivity {
                     temp2=(Double.parseDouble(operand.get(operand.size()-1).toString()));
                     operand.remove(operand.size()-1);
                     switch (temp6.charAt(0)){
-                        case '+':{result=temp2+temp3;operand.add(String.valueOf(result));break;}
-                        case '-':{result=temp2-temp3;operand.add(String.valueOf(result));break;}
-                        case '*':{result=temp2*temp3;operand.add(String.valueOf(result));break;}
-                        case '/':{result=temp2/temp3;operand.add(String.valueOf(result));break;}
+                        case '+':{result=Add(temp2,temp3);operand.add(String.valueOf(result));break;}
+                        case '-':{result=Sub(temp2,temp3);operand.add(String.valueOf(result));break;}
+                        case '*':{result=Mul(temp2,temp3);operand.add(String.valueOf(result));break;}
+                        case '/':{result=Div(temp2,temp3);operand.add(String.valueOf(result));break;}
                     }
                 }
             }
