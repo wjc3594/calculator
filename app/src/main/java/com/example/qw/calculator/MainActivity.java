@@ -1,4 +1,4 @@
-package com.example.qw.calculator;
+﻿package com.example.qw.calculator;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
