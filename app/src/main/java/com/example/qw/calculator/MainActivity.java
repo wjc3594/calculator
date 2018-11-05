@@ -1,4 +1,4 @@
-package com.example.qw.calculator;
+﻿package com.example.qw.calculator;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -21,7 +21,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         //初始化
         show_equation=new StringBuilder();
         calculate_equation=new ArrayList<>();
