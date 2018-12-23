@@ -1,18 +1,16 @@
-﻿package com.example.qw.calculator;
+package com.example.qw.calculator;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.text.InputType;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
-
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity{
 
     private  StringBuilder show_equation=new StringBuilder();//显示运算式
     private  ArrayList calculate_equation;//计算式
@@ -45,6 +43,13 @@ public class MainActivity extends AppCompatActivity {
         final EditText result=(EditText)findViewById(R.id.result);
         result.setCursorVisible(true);
         disableShowInput(result);
+        //点击文本框时光标始终在文本末尾
+        result.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                result.setSelection(result.getText().length());
+            }
+        });
         zero.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v){
@@ -286,15 +291,25 @@ public class MainActivity extends AppCompatActivity {
                     for(int i=0;i<show_equation.length();i++){
                         if(show_equation.charAt(i)>='0'&&show_equation.charAt(i)<='9'||show_equation.charAt(i)=='.'){
                             temp1.append(String.valueOf(show_equation.charAt(i)));
+                        }else if(show_equation.charAt(i)=='N'){
+                            calculate_equation.add("NaN");
+                            //跳过2个字符
+                            i=i+2;
+                        }else if(show_equation.charAt(i)=='∞'){
+                            calculate_equation.add("∞");
                         }
                         else
                         {
-                            calculate_equation.add(temp1.toString());
-                            temp1.delete(0,temp1.length());
+                            if(temp1.length()!=0){
+                                calculate_equation.add(temp1.toString());
+                                temp1.delete(0,temp1.length());
+                            }
                             calculate_equation.add(String.valueOf(show_equation.charAt(i)));
                         }
                     }
-                    calculate_equation.add(temp1.toString());
+                    if(temp1.length()!=0){
+                        calculate_equation.add(temp1.toString());
+                    }
                     calculate_equation.add("#");
                     String temp8=calculate(calculate_equation);
                     result.setText(temp8);
@@ -408,35 +423,68 @@ public class MainActivity extends AppCompatActivity {
             return true;
     }
     //相加
-    public static double Add(double d1,double d2) {
+    public static Double Add(Double d1,Double d2) {
+        if(d1==Double.NEGATIVE_INFINITY||d1==Double.POSITIVE_INFINITY||d2==Double.NEGATIVE_INFINITY||d2==Double.POSITIVE_INFINITY){
+            return d1+d2;
+        }
+        if(String.valueOf(d1).equals("NaN")||String.valueOf(d1).equals("NaN")){
+            return d1+d2;
+        }
         BigDecimal b1 = new BigDecimal(Double.toString(d1));
         BigDecimal b2 = new BigDecimal(Double.toString(d2));
         return b1.add(b2).doubleValue();
     }
     //相减
-    public static double Sub(double d1,double d2){
+    public static Double Sub(Double d1,Double d2){
+        if(d1==Double.NEGATIVE_INFINITY||d1==Double.POSITIVE_INFINITY||d2==Double.NEGATIVE_INFINITY||d2==Double.POSITIVE_INFINITY){
+            return d1-d2;
+        }
+        if(String.valueOf(d1).equals("NaN")||String.valueOf(d1).equals("NaN")){
+            return d1-d2;
+        }
+        if(String.valueOf(d1).equals("NaN")||String.valueOf(d1).equals("NaN")){
+            return d1*d2;
+        }
         BigDecimal b1=new BigDecimal(Double.toString(d1));
         BigDecimal b2=new BigDecimal(Double.toString(d2));
         return b1.subtract(b2).doubleValue();
     }
     //相乘
-    public static double Mul(double d1,double d2){
+    public static Double Mul(Double d1,Double d2){
+        if(d1==Double.NEGATIVE_INFINITY||d1==Double.POSITIVE_INFINITY||d2==Double.NEGATIVE_INFINITY||d2==Double.POSITIVE_INFINITY){
+            return d1*d2;
+        }
+        if(String.valueOf(d1).equals("NaN")||String.valueOf(d1).equals("NaN")){
+            return d1*d2;
+        }
         BigDecimal b1=new BigDecimal(Double.toString(d1));
         BigDecimal b2=new BigDecimal(Double.toString(d2));
-        return b1.multiply(b2).doubleValue();
+        return b1.multiply(b2).setScale(8).doubleValue();
     }
     //相除
-    public static double Div(double d1,double d2){
+    public static Double Div(Double d1,Double d2){
+        if(d1==Double.NEGATIVE_INFINITY||d1==Double.POSITIVE_INFINITY||d2==Double.NEGATIVE_INFINITY||d2==Double.POSITIVE_INFINITY){
+            return d1/d2;
+        }
+        if(String.valueOf(d1).equals("NaN")||String.valueOf(d1).equals("NaN")){
+            return d1/d2;
+        }
+        if(d1==0.0&&d2==0.0){
+            return Double.NaN;
+        }
+        if(d2==0.0){
+            return d1/d2;
+        }
         BigDecimal b1=new BigDecimal(Double.toString(d1));
         BigDecimal b2=new BigDecimal(Double.toString(d2));
-        return b1.divide(b2,10,BigDecimal.ROUND_HALF_UP).doubleValue();
+        return b1.divide(b2,8,BigDecimal.ROUND_HALF_UP).doubleValue();
     }
     protected String calculate(ArrayList equation){
         Double temp2;
         Double temp3;
         Double result;
-        ArrayList operator=new ArrayList();
-        ArrayList operand=new ArrayList();
+        List operator=new ArrayList();
+        List<Double> operand=new ArrayList();
         for(int i=0;i<equation.size();i++)
         {
             String temp4=(String) equation.get(i);
@@ -448,15 +496,15 @@ public class MainActivity extends AppCompatActivity {
                     while(!(operatorPriorityCompare(temp4.charAt(0),temp5.charAt(0)))&&operator.size()>0)
                     {
                         operator.remove(operator.size()-1);
-                        temp3=(Double.parseDouble(operand.get(operand.size()-1).toString()));
+                        temp3=operand.get(operand.size()-1);
                         operand.remove(operand.size()-1);
-                        temp2=(Double.parseDouble(operand.get(operand.size()-1).toString()));
+                        temp2=operand.get(operand.size()-1);
                         operand.remove(operand.size()-1);
                         switch (temp5.charAt(0)){
-                            case '+':{result=Add(temp2,temp3);operand.add(String.valueOf(result));break;}
-                            case '-':{result=Sub(temp2,temp3);operand.add(String.valueOf(result));break;}
-                            case '*':{result=Mul(temp2,temp3);operand.add(String.valueOf(result));break;}
-                            case '/':{result=Div(temp2,temp3);operand.add(String.valueOf(result));break;}
+                            case '+':{result=Add(temp2,temp3);operand.add(result);break;}
+                            case '-':{result=Sub(temp2,temp3);operand.add(result);break;}
+                            case '*':{result=Mul(temp2,temp3);operand.add(result);break;}
+                            case '/':{result=Div(temp2,temp3);operand.add(result);break;}
                         }
                         if(operator.size()>0)
                         {
@@ -476,23 +524,31 @@ public class MainActivity extends AppCompatActivity {
                 {
                     String temp6=(String)operator.get(operator.size()-1);
                     operator.remove(operator.size()-1);
-                    temp3=(Double.parseDouble(operand.get(operand.size()-1).toString()));
+                    temp3=operand.get(operand.size()-1);
                     operand.remove(operand.size()-1);
-                    temp2=(Double.parseDouble(operand.get(operand.size()-1).toString()));
+                    temp2=operand.get(operand.size()-1);
                     operand.remove(operand.size()-1);
                     switch (temp6.charAt(0)){
-                        case '+':{result=Add(temp2,temp3);operand.add(String.valueOf(result));break;}
-                        case '-':{result=Sub(temp2,temp3);operand.add(String.valueOf(result));break;}
-                        case '*':{result=Mul(temp2,temp3);operand.add(String.valueOf(result));break;}
-                        case '/':{result=Div(temp2,temp3);operand.add(String.valueOf(result));break;}
+                        case '+':{result=Add(temp2,temp3);operand.add(result);break;}
+                        case '-':{result=Sub(temp2,temp3);operand.add(result);break;}
+                        case '*':{result=Mul(temp2,temp3);operand.add(result);break;}
+                        case '/':{result=Div(temp2,temp3);operand.add(result);break;}
                     }
                 }
             }
             else
             {
-                operand.add(temp4);
+                if(temp4.equals("NaN")){
+                    operand.add(Double.NaN);
+                }else if(temp4.equals("∞")){
+                    operand.add(Double.POSITIVE_INFINITY);
+                }else{
+                    operand.add(Double.parseDouble(temp4));
+                }
             }
         }
+        if(operand.get(0)==Double.NEGATIVE_INFINITY) return "-∞";
+        if(operand.get(0)==Double.POSITIVE_INFINITY) return "∞";
         return operand.get(0).toString();
     }
     //当API最低版小于21时使用这个函数实现点击文本框不弹出键盘
