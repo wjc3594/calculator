@@ -56,7 +56,9 @@ public class MainActivity extends AppCompatActivity{
                  if(!(show_equation.toString().equals("0"))){
                      if(signal==0){
                          show_equation.append("0");
+                         //显示运算式
                          result.setText(show_equation);
+                         //将光标定位到文本末尾
                          result.setSelection(result.getText().length());
                      }else{
                          show_equation.delete(0,show_equation.length());
@@ -68,6 +70,9 @@ public class MainActivity extends AppCompatActivity{
                  }
             }
         });
+        //接下来1到9每个控件依次进行此设置
+        //保证若是在结果上进行输入时清除结果然后显示点击的数字
+        //若是正常输入则直接在运算式末尾加上点击的数字并显示
         one.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -212,6 +217,7 @@ public class MainActivity extends AppCompatActivity{
                 }
             }
         });
+        //清屏
         cls.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -221,6 +227,9 @@ public class MainActivity extends AppCompatActivity{
                 result.setText("");
             }
         });
+        //后退键
+        //若在结果上使用，则直接清屏
+        //正常输入时使用，后退一格
         backspace.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -237,34 +246,47 @@ public class MainActivity extends AppCompatActivity{
                 }
             }
         });
+        //小数点的点击事件
         point.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //正常输入时点击小数点的处理逻辑
                 if(signal==0){
+                    //把运算式赋给字符串a
                     String a=show_equation.toString();
+                    //运算式为空，直接加一个小数点并显示
                     if(a.equals("")){
                         show_equation.append(".");
                         result.setText(show_equation);
                         result.setSelection(result.getText().length());
-                    }else{
+                    }
+                    //运算式不为空
+                    else{
                         int i;
                         char t='0';
+                        //从运算式末尾向前遍历，碰到'.''+''-''*''/'后结束遍历退出
                         for(i=a.length();i>0;i--){
                             t=a.charAt(i-1);
                             if(t=='.'||t=='+'||t=='-'||t=='*'||t=='/')
                                 break;
                         }
+                        //i==0表示遍历运算式没有发现'.''+''-''*''/'，则直接在运算式末尾加小数点
                         if(i==0){
                             show_equation.append(".");
                             result.setText(show_equation);
                             result.setSelection(result.getText().length());
-                        }else if(t=='+'||t=='-'||t=='*'||t=='/'){
+                        }
+                        //在碰到小数点前碰到了'+''-''*''/'，也直接在运算式末尾加小数点
+                        else if(t=='+'||t=='-'||t=='*'||t=='/'){
                             show_equation.append(".");
                             result.setText(show_equation);
                             result.setSelection(result.getText().length());
                         }
+                        //以上条件均不满足，若说明遍历碰到了小数点，因为一个数不能同时有两个小数点，所以此次点击小数点不做处理
                     }
-                }else{
+                }
+                //在结果上点击小数点，直接清屏然后加上小数点并显示
+                else{
                     show_equation.delete(0,show_equation.length());
                     show_equation.append(".");
                     result.setText(".");
@@ -279,43 +301,53 @@ public class MainActivity extends AppCompatActivity{
             public void onClick(View v) {
                 //判断用户是否输入了内容
                 if(!show_equation.toString().equals("")){
-                    signal=1;
-                    char temp=show_equation.charAt(show_equation.length()-1);
-                    if(show_equation.charAt(0)=='-')
-                        show_equation.insert(0,"0");
-                    if(temp=='+'||temp=='-')
-                        show_equation.append("0");
-                    if(temp=='*'||temp=='/')
-                        show_equation.append("1");
+                    signal = 1;//表示在输入结果上
+                    char temp = show_equation.charAt(show_equation.length() - 1);//把运算式的最后一个字符赋给temp
+                    if (show_equation.charAt(0) == '-')//如果运算式的第一个字符是'-'，说明用户是想输入一个负数
+                        show_equation.insert(0, "0");//此时在运算式的最前面加一个0,用'0-运算数'表示负数
+                    if (temp == '+' || temp == '-')//若为加减
+                        show_equation.append("0");//则结尾默认加减零
+                    if (temp == '*' || temp == '/')//若为乘除
+                        show_equation.append("1");//则结尾默认乘除1
                     StringBuilder temp1=new StringBuilder();
+                    //从头遍历运算式
                     for(int i=0;i<show_equation.length();i++){
                         if(show_equation.charAt(i)>='0'&&show_equation.charAt(i)<='9'||show_equation.charAt(i)=='.'){
+                            //如果是连着的数字和小数点，那就一个一个的拼到temp1中，作为一个完整的运算数
                             temp1.append(String.valueOf(show_equation.charAt(i)));
                         }else if(show_equation.charAt(i)=='N'){
+                            //如果是NaN就直接把'NaN'加进计算式里
                             calculate_equation.add("NaN");
                             //跳过2个字符
                             i=i+2;
                         }else if(show_equation.charAt(i)=='∞'){
+                            //如果是∞就直接把'∞'加进计算式里
                             calculate_equation.add("∞");
                         }
-                        else
+                        else//这种就是遍历到'+''-''*''/'这四种运算符的情况
                         {
+                            //如果temp1长度不为0，说明运算符前有运算数，则把该运算数添加进计算式中并清空temp1中的内容
                             if(temp1.length()!=0){
                                 calculate_equation.add(temp1.toString());
                                 temp1.delete(0,temp1.length());
                             }
+                            //把运算符添加进去
                             calculate_equation.add(String.valueOf(show_equation.charAt(i)));
                         }
                     }
+                    //把最后一个运算数加进运算式里
                     if(temp1.length()!=0){
                         calculate_equation.add(temp1.toString());
                     }
                     calculate_equation.add("#");
+                    //调用calculate计算出结果返回给temp8
                     String temp8=calculate(calculate_equation);
                     result.setText(temp8);
                     result.setSelection(result.getText().length());
+                    //清空运算式和计算式
                     show_equation.delete(0,show_equation.length());
                     calculate_equation.clear();
+                    //将结果赋给运算式
                     show_equation.append(temp8);
                 }
             }
@@ -353,6 +385,12 @@ public class MainActivity extends AppCompatActivity{
                     }
                     else
                         show_equation.append("-");
+                    result.setText(show_equation);
+                    result.setSelection(result.getText().length());
+                }
+                else{
+                    signal=0;
+                    show_equation.append("-");
                     result.setText(show_equation);
                     result.setSelection(result.getText().length());
                 }
@@ -428,10 +466,13 @@ public class MainActivity extends AppCompatActivity{
             return d1+d2;
         }
         if(String.valueOf(d1).equals("NaN")||String.valueOf(d1).equals("NaN")){
+            //如果两个运算数只要有一个是非数'NaN'，就直接运算即可
             return d1+d2;
         }
+        //BigDecimal为精确计算的一个数据类型，你可以理解为使用它进行计算结果将更准确
         BigDecimal b1 = new BigDecimal(Double.toString(d1));
         BigDecimal b2 = new BigDecimal(Double.toString(d2));
+        //进行计算并将结果转为double返回
         return b1.add(b2).doubleValue();
     }
     //相减
@@ -479,6 +520,8 @@ public class MainActivity extends AppCompatActivity{
         BigDecimal b2=new BigDecimal(Double.toString(d2));
         return b1.divide(b2,8,BigDecimal.ROUND_HALF_UP).doubleValue();
     }
+    //这个方法就是用来计算结果的，在344行被调用，参数为计算式
+    //里面过程比较复杂，你需先弄懂后缀表达式，然后可对照理解大概流程意思即可
     protected String calculate(ArrayList equation){
         Double temp2;
         Double temp3;
