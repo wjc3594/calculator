@@ -300,7 +300,7 @@ public class MainActivity extends AppCompatActivity{
             @Override
             public void onClick(View v) {
                 //判断用户是否输入了内容
-                if(!show_equation.toString().equals("")){
+                if(!show_equation.toString().equals("")&&!(show_equation.toString().equals("错误"))){
                     signal = 1;//表示在输入结果上
                     char temp = show_equation.charAt(show_equation.length() - 1);//把运算式的最后一个字符赋给temp
                     if (show_equation.charAt(0) == '-')//如果运算式的第一个字符是'-'，说明用户是想输入一个负数
@@ -356,7 +356,7 @@ public class MainActivity extends AppCompatActivity{
             @Override
             public void onClick(View v) {
                 //判断用户是否输入了内容
-                if(!(show_equation.toString().equals(""))) {
+                if(!(show_equation.toString().equals(""))&&!(show_equation.toString().equals("错误"))) {
                     signal=0;
                     char temp=show_equation.charAt(show_equation.length()-1);
                     if(temp=='+'||temp=='-'||temp=='*'||temp=='/')
@@ -375,7 +375,7 @@ public class MainActivity extends AppCompatActivity{
             @Override
             public void onClick(View v) {
                 //判断用户是否输入了内容
-                if(!(show_equation.toString().equals(""))) {
+                if(!(show_equation.toString().equals(""))&&!(show_equation.toString().equals("错误"))) {
                     signal=0;
                     char temp=show_equation.charAt(show_equation.length()-1);
                     if(temp=='+'||temp=='-'||temp=='*'||temp=='/')
@@ -388,7 +388,7 @@ public class MainActivity extends AppCompatActivity{
                     result.setText(show_equation);
                     result.setSelection(result.getText().length());
                 }
-                else{
+                else if(!(show_equation.toString().equals("错误"))){
                     signal=0;
                     show_equation.append("-");
                     result.setText(show_equation);
@@ -401,7 +401,7 @@ public class MainActivity extends AppCompatActivity{
             @Override
             public void onClick(View v) {
                 //判断用户是否输入了内容
-                if(!(show_equation.toString().equals(""))) {
+                if(!(show_equation.toString().equals(""))&&!(show_equation.toString().equals("错误"))) {
                     signal=0;
                     char temp=show_equation.charAt(show_equation.length()-1);
                     if(temp=='+'||temp=='-'||temp=='*'||temp=='/')
@@ -421,7 +421,7 @@ public class MainActivity extends AppCompatActivity{
             @Override
             public void onClick(View v) {
                 //判断用户是否输入了内容
-                if(!(show_equation.toString().equals(""))) {
+                if(!(show_equation.toString().equals(""))&&!(show_equation.toString().equals("错误"))) {
                     signal=0;
                     char temp=show_equation.charAt(show_equation.length()-1);
                     if(temp=='+'||temp=='-'||temp=='*'||temp=='/')
@@ -585,6 +585,8 @@ public class MainActivity extends AppCompatActivity{
                     operand.add(Double.NaN);
                 }else if(temp4.equals("∞")){
                     operand.add(Double.POSITIVE_INFINITY);
+                }else if(temp4.equals(".")){
+                    return "错误";
                 }else{
                     operand.add(Double.parseDouble(temp4));
                 }
